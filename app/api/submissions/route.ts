@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { submissionSchema } from "@/lib/validation";
 import { slugify } from "@/lib/slug";
+import { checkRateLimit, clientIp } from "@/lib/rate-limit";
 
 async function ensureSlug(base: string): Promise<string> {
   let slug = slugify(base);
@@ -17,6 +18,16 @@ async function ensureSlug(base: string): Promise<string> {
 
 export async function POST(req: Request) {
   try {
+    const throttle = checkRateLimit(`submissions:${clientIp(req)}`, {
+      limit: 5,
+      windowMs: 10 * 60 * 1000,
+    });
+    if (!throttle.ok) {
+      return NextResponse.json(
+        { error: { code: "RATE_LIMITED", message: "Too many submissions. Try again later." } },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(throttle.resetMs / 1000)) } }
+      );
+    }
     const json = await req.json();
     const parsed = submissionSchema.safeParse(json);
     if (!parsed.success) {
