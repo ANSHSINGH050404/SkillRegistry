@@ -1,41 +1,32 @@
-import { prisma } from "@/lib/prisma";
 import { SkillCard } from "@/components/cards/skill-card";
 import { SearchInput } from "@/components/search/search-input";
+import { searchParamsSchema } from "@/lib/validation";
+import { searchSkills } from "@/lib/search";
 
 export default async function SkillsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { q = "" } = await searchParams;
-  let skills: Array<{
-    slug: string; name: string; shortDescription: string;
-    technologies: Array<{ technology: { name: string } }>;
-    agents: Array<{ agent: { name: string } }>;
-  }> = [];
-  try {
-    skills = await prisma.skill.findMany({
-      where: {
-        status: "PUBLISHED",
-        ...(q ? { OR: [{ name: { contains: q, mode: "insensitive" } }, { description: { contains: q, mode: "insensitive" } }] } : {}),
-      },
-      orderBy: [{ featured: "desc" }, { updatedAt: "desc" }],
-      take: 24,
-      select: {
-        slug: true, name: true, shortDescription: true,
-        technologies: { select: { technology: { select: { name: true } } } },
-        agents: { select: { agent: { select: { name: true } } } },
-      },
-    });
-  } catch {
-    skills = [];
+  const raw = await searchParams;
+  const flat: Record<string, string> = {};
+  for (const [k, v] of Object.entries(raw)) if (typeof v === "string") flat[k] = v;
+  const parsed = searchParamsSchema.safeParse(flat);
+  const q = parsed.success ? parsed.data.q : "";
+  let items: Awaited<ReturnType<typeof searchSkills>>["items"] = [];
+  let nextCursor: string | null = null;
+  if (parsed.success) {
+    try {
+      const res = await searchSkills(parsed.data);
+      items = res.items; nextCursor = res.nextCursor;
+    } catch { items = []; }
   }
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-semibold tracking-tight">Skills{q ? ` for “${q}”` : ""}</h1>
       <div className="max-w-xl"><SearchInput defaultValue={q} /></div>
-      {skills.length === 0 ? (
+      {items.length === 0 ? (
         <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
           <p className="font-medium">No skills found{q ? ` for “${q}”` : ""}.</p>
           <ul className="mt-2 list-disc pl-5 text-sm text-zinc-600 dark:text-zinc-400">
@@ -46,15 +37,16 @@ export default async function SkillsPage({
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-3">
-          {skills.map((s) => (
+          {items.map((s) => (
             <SkillCard key={s.slug} skill={{
               slug: s.slug, name: s.name, shortDescription: s.shortDescription,
-              technologies: s.technologies.map((t) => t.technology.name),
-              agents: s.agents.map((a) => a.agent.name),
+              technologies: s.technologies,
+              agents: s.agents,
             }} />
           ))}
         </div>
       )}
+      {nextCursor && <p className="text-xs text-zinc-500">More results available (cursor pagination).</p>}
     </div>
   );
 }
