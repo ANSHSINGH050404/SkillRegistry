@@ -1,0 +1,207 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  CURATOR
+  ADMIN
+}
+
+enum SkillStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+  ARCHIVED
+}
+
+enum Verification {
+  COMMUNITY
+  VERIFIED
+  OFFICIAL
+}
+
+model User {
+  id             String   @id @default(cuid())
+  email          String   @unique
+  name           String?
+  username       String?  @unique
+  avatarUrl      String?
+  githubUsername String?
+  role           UserRole @default(USER)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  skills         Skill[]  @relation("SkillAuthor")
+
+  @@index([role])
+}
+
+model Skill {
+  id               String      @id @default(cuid())
+  name             String
+  slug             String      @unique
+  shortDescription String
+  description      String      @db.Text
+  readme           String?     @db.Text
+  icon             String?
+  repositoryUrl    String?
+  sourceUrl        String?
+  homepageUrl      String?
+  installCommand   String
+  authorId         String?
+  author           User?       @relation("SkillAuthor", fields: [authorId], references: [id], onDelete: SetNull)
+  status           SkillStatus @default(DRAFT)
+  featured         Boolean     @default(false)
+  verification     Verification @default(COMMUNITY)
+  githubStars      Int         @default(0)
+  githubForks      Int         @default(0)
+  githubIssues     Int         @default(0)
+  githubLastUpdated DateTime?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  technologies SkillTechnology[]
+  categories   SkillCategory[]
+  agents       SkillAgent[]
+  tags         SkillTag[]
+  versions     SkillVersion[]
+
+  @@index([status])
+  @@index([status, createdAt])
+  @@index([status, updatedAt])
+  @@index([featured, status])
+  @@index([verification, status])
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model Technology {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  websiteUrl  String?
+  githubUrl   String?
+  logoUrl     String?
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skills   SkillTechnology[]
+  versions TechnologyVersion[]
+
+  @@index([slug])
+  @@index([categoryId])
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skills       SkillCategory[]
+  technologies Technology[]
+
+  @@index([slug])
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?  @db.Text
+  websiteUrl  String?
+  logoUrl     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  skills SkillAgent[]
+
+  @@index([slug])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  createdAt DateTime @default(now())
+
+  skills SkillTag[]
+
+  @@index([slug])
+}
+
+model SkillTechnology {
+  skillId      String
+  technologyId String
+  skill        Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, technologyId])
+  @@index([technologyId])
+}
+
+model SkillCategory {
+  skillId    String
+  categoryId String
+  skill      Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, categoryId])
+  @@index([categoryId])
+}
+
+model SkillAgent {
+  skillId String
+  agentId String
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  agent   Agent @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, agentId])
+  @@index([agentId])
+}
+
+model SkillTag {
+  skillId String
+  tagId   String
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  tag     Tag   @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([skillId, tagId])
+  @@index([tagId])
+}
+
+model SkillVersion {
+  id             String   @id @default(cuid())
+  skillId        String
+  skill          Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  version        String
+  changelog      String?  @db.Text
+  sourceUrl      String?
+  installCommand String?
+  publishedAt    DateTime @default(now())
+
+  @@unique([skillId, version])
+  @@index([skillId])
+}
+
+model TechnologyVersion {
+  id           String     @id @default(cuid())
+  technologyId String
+  technology   Technology @relation(fields: [technologyId], references: [id], onDelete: Cascade)
+  version      String
+  releaseDate  DateTime?
+
+  @@unique([technologyId, version])
+  @@index([technologyId])
+}
