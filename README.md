@@ -13,7 +13,7 @@ cp .env.example .env   # fill Neon/Vercel/PostHog/GitHub/ADMIN_SECRET
 pnpm install
 pnpm db:generate
 pnpm db:migrate        # needs real DIRECT_URL (Neon)
-pnpm db:seed           # synthetic demo data, metrics zero
+pnpm db:seed           # taxonomy only (tech/agents/categories); skills via prisma/import-mattpocock.ts
 pnpm dev
 ```
 
