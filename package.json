@@ -1,7 +1,16 @@
 {
   "name": "skillregistry",
   "version": "0.1.0",
-  "private": true,
+  "description": "Searchable registry for skills that extend AI coding agents",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-org/skillregistry.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-org/skillregistry/issues"
+  },
+  "homepage": "https://github.com/your-org/skillregistry#readme",
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
