@@ -1,5 +1,7 @@
 import { prisma } from "./prisma";
 import type { SearchParams } from "./validation";
+import { AppError } from "./errors";
+import { decodeCursor, encodeCursor, buildCursorFilter, type CursorPayload } from "./cursor";
 
 export type SearchItem = {
   slug: string;
@@ -56,26 +58,34 @@ export async function searchSkills(params: SearchParams): Promise<SearchResult> 
   if (and.length > 0) (where as Record<string, unknown>).AND = and;
 
   const sort = params.sort ?? "relevance";
+  // Deterministic ordering: every mode ends in a unique `id ASC` tiebreaker
+  // so the composite keyset cursor in lib/cursor.ts resumes exactly.
   const orderBy =
     sort === "popular"
-      ? [{ featured: "desc" as const }, { githubStars: "desc" as const }, { updatedAt: "desc" as const }]
+      ? [{ featured: "desc" as const }, { githubStars: "desc" as const }, { updatedAt: "desc" as const }, { id: "asc" as const }]
       : sort === "recent"
-        ? [{ createdAt: "desc" as const }]
+        ? [{ createdAt: "desc" as const }, { id: "asc" as const }]
         : sort === "updated"
-          ? [{ updatedAt: "desc" as const }]
-          : [{ featured: "desc" as const }, { updatedAt: "desc" as const }];
+          ? [{ updatedAt: "desc" as const }, { id: "asc" as const }]
+          : [{ featured: "desc" as const }, { updatedAt: "desc" as const }, { id: "asc" as const }];
 
-  const cursorClause = params.cursor
-    ? { id: { gt: params.cursor } }
-    : {};
-  const mergedWhere = { ...where, ...cursorClause };
+  let cursorFilter: Record<string, unknown> = {};
+  if (params.cursor) {
+    const decoded = decodeCursor(params.cursor);
+    if (!decoded || decoded.sort !== sort) {
+      throw new AppError("INVALID", "Invalid cursor.", 400);
+    }
+    cursorFilter = buildCursorFilter(sort, decoded);
+  }
+  const mergedWhere = { ...where, ...cursorFilter };
 
   const rows = await prisma.skill.findMany({
     where: mergedWhere as never,
     orderBy,
     take: limit + 1,
     select: {
-      id: true, slug: true, name: true, shortDescription: true, updatedAt: true,
+      id: true, slug: true, name: true, shortDescription: true,
+      featured: true, githubStars: true, createdAt: true, updatedAt: true,
       technologies: { select: { technology: { select: { name: true } } } },
       agents: { select: { agent: { select: { name: true } } } },
     },
@@ -83,6 +93,18 @@ export async function searchSkills(params: SearchParams): Promise<SearchResult> 
 
   const hasMore = rows.length > limit;
   const page = hasMore ? rows.slice(0, limit) : rows;
+  const last = page[page.length - 1];
+  const nextCursor =
+    hasMore && last
+      ? encodeCursor({
+          sort,
+          id: last.id,
+          featured: last.featured,
+          githubStars: last.githubStars,
+          updatedAt: last.updatedAt.toISOString(),
+          createdAt: last.createdAt.toISOString(),
+        } satisfies CursorPayload)
+      : null;
   return {
     items: page.map((r) => ({
       id: r.id, slug: r.slug, name: r.name, shortDescription: r.shortDescription,
@@ -90,6 +112,6 @@ export async function searchSkills(params: SearchParams): Promise<SearchResult> 
       agents: r.agents.map((a) => a.agent.name),
       updatedAt: r.updatedAt.toISOString(),
     })),
-    nextCursor: hasMore ? page[page.length - 1].id : null,
+    nextCursor,
   };
 }

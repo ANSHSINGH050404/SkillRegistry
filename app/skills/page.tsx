@@ -1,6 +1,7 @@
 import { SkillCard } from "@/components/cards/skill-card";
 import { SearchInput } from "@/components/search/search-input";
 import { searchParamsSchema } from "@/lib/validation";
+import { decodeCursor } from "@/lib/cursor";
 import { searchSkills } from "@/lib/search";
 
 export default async function SkillsPage({
@@ -17,7 +18,12 @@ export default async function SkillsPage({
   let nextCursor: string | null = null;
   if (parsed.success) {
     try {
-      const res = await searchSkills(parsed.data);
+      // A malformed/forged cursor restarts at the first page rather than
+      // surfacing an empty error state (the API still 400s on direct misuse).
+      const params = parsed.data.cursor && !decodeCursor(parsed.data.cursor)
+        ? { ...parsed.data, cursor: undefined }
+        : parsed.data;
+      const res = await searchSkills(params);
       items = res.items; nextCursor = res.nextCursor;
     } catch { items = []; }
   }
