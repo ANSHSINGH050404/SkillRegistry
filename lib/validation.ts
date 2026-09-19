@@ -6,7 +6,13 @@ export const searchParamsSchema = z.object({
   category: z.string().trim().max(100).optional(),
   technology: z.string().trim().max(100).optional(),
   tag: z.string().trim().max(100).optional(),
-  verified: z.coerce.boolean().optional(),
+  // NB: z.coerce.boolean() turns "false" into true (any non-empty string is
+  // truthy). Only explicit truthy values enable the filter; "false"/absent
+  // means no filter (there is no only-unverified query in V1).
+  verified: z
+    .union([z.boolean(), z.string()])
+    .optional()
+    .transform((v) => (v === true || v === "true" || v === "1" ? true : undefined)),
   sort: z.enum(["relevance", "popular", "recent", "updated"]).optional().default("relevance"),
   cursor: z.string().optional(),
   limit: z.coerce.number().int().min(1).max(50).optional().default(24),

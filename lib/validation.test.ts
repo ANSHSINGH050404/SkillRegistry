@@ -11,6 +11,14 @@ describe("searchParamsSchema", () => {
     const p = searchParamsSchema.safeParse({ limit: "999" });
     expect(p.success).toBe(false);
   });
+  it("parses verified=true strictly", () => {
+    expect(searchParamsSchema.parse({ verified: "true" }).verified).toBe(true);
+    expect(searchParamsSchema.parse({ verified: "1" }).verified).toBe(true);
+  });
+  it('treats verified=false and absent as no filter', () => {
+    expect(searchParamsSchema.parse({ verified: "false" }).verified).toBeUndefined();
+    expect(searchParamsSchema.parse({}).verified).toBeUndefined();
+  });
 });
 
 describe("submissionSchema", () => {
