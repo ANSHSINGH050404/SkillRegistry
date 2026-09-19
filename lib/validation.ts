@@ -38,3 +38,17 @@ export const submissionSchema = z.object({
 });
 
 export type SubmissionInput = z.infer<typeof submissionSchema>;
+
+// Comma-separated text inputs (technologies, categories, agents, tags) arrive
+// as strings from the form; the API expects arrays. Single choke point so the
+// client and any future importer parse identically.
+export function parseCommaList(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.map((s) => String(s).trim()).filter(Boolean);
+  }
+  if (typeof value !== "string") return [];
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+}

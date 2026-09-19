@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { searchParamsSchema, submissionSchema } from "./validation";
+import { searchParamsSchema, submissionSchema, parseCommaList } from "./validation";
 
 describe("searchParamsSchema", () => {
   it("defaults sort and limit", () => {
@@ -39,5 +39,21 @@ describe("submissionSchema", () => {
   it("rejects arbitrary install commands", () => {
     const r = submissionSchema.safeParse({ ...base, installCommand: "rm -rf /" });
     expect(r.success).toBe(false);
+  });
+});
+
+describe("parseCommaList", () => {
+  it("splits on commas and trims", () => {
+    expect(parseCommaList("Prisma, Drizzle ,PostgreSQL")).toEqual(["Prisma", "Drizzle", "PostgreSQL"]);
+  });
+  it("drops empties", () => {
+    expect(parseCommaList("a,, ,b,")).toEqual(["a", "b"]);
+  });
+  it("passes arrays through trimmed", () => {
+    expect(parseCommaList([" a ", "b"])).toEqual(["a", "b"]);
+  });
+  it("returns [] for non-strings", () => {
+    expect(parseCommaList(undefined)).toEqual([]);
+    expect(parseCommaList(42)).toEqual([]);
   });
 });
