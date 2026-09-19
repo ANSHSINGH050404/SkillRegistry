@@ -5,7 +5,9 @@ import { fetchRepoMeta } from "@/lib/github";
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params;
-    const { action } = (await req.json().catch(() => ({}))) as { action?: string };
+    // Parse the body once: a Request body can only be consumed a single time.
+    const body = (await req.json().catch(() => ({}))) as { action?: string; verification?: string };
+    const { action } = body;
     if (action === "approve") {
       const skill = await prisma.skill.findUnique({ where: { id }, select: { id: true, repositoryUrl: true } });
       if (!skill) return NextResponse.json({ error: { code: "NOT_FOUND", message: "Skill not found." } }, { status: 404 });
@@ -39,9 +41,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
       return NextResponse.json({ ok: true });
     }
     if (action === "verify") {
-      const { verification } = (await req.json().catch(() => ({}))) as { verification?: string };
       const allowed = ["COMMUNITY", "VERIFIED", "OFFICIAL"];
-      const v = typeof verification === "string" ? verification : "VERIFIED";
+      const v = typeof body.verification === "string" ? body.verification : "VERIFIED";
       if (!allowed.includes(v)) return NextResponse.json({ error: { code: "INVALID", message: "Bad verification." } }, { status: 400 });
       await prisma.skill.update({ where: { id }, data: { verification: v as never } });
       return NextResponse.json({ ok: true });
