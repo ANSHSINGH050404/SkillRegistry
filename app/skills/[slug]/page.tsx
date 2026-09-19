@@ -46,6 +46,28 @@ export default async function SkillPage({ params }: { params: Promise<{ slug: st
   }
   if (!skill || skill.status !== "PUBLISHED") notFound();
 
+  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        name: skill.name,
+        description: skill.shortDescription,
+        url: `${base}/skills/${skill.slug}`,
+        applicationCategory: "DeveloperApplication",
+        operatingSystem: "Any",
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Skills", item: `${base}/skills` },
+          { "@type": "ListItem", position: 2, name: skill.name, item: `${base}/skills/${skill.slug}` },
+        ],
+      },
+    ],
+  };
+
   let related: Array<{ slug: string; name: string; shortDescription: string; technologies: Array<{ technology: { name: string } }>; agents: Array<{ agent: { name: string } }> }> = [];
   try {
     const techIds = skill.technologies.map((t) => t.technologyId);
@@ -64,6 +86,7 @@ export default async function SkillPage({ params }: { params: Promise<{ slug: st
 
   return (
     <article className="space-y-8">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <header>
         <h1 className="text-3xl font-semibold tracking-tight">{skill.name}</h1>
         <p className="mt-2 text-zinc-600 dark:text-zinc-400">{skill.shortDescription}</p>
