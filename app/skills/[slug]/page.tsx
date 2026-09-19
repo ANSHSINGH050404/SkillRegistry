@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SkillCard } from "@/components/cards/skill-card";
+import { InstallSection } from "@/components/skills/install-section";
 
 export const revalidate = 300;
 
@@ -131,10 +132,7 @@ export default async function SkillPage({ params }: { params: Promise<{ slug: st
         </div>
       </section>
 
-      <section aria-labelledby="install">
-        <h2 id="install" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## installation</h2>
-        <pre className="mt-4 overflow-x-auto rounded-md border border-hairline bg-surface p-4 font-mono text-base font-medium text-foreground">{skill.installCommand}<span className="terminal-cursor ml-2" aria-hidden="true" /></pre>
-      </section>
+      <InstallSection command={skill.installCommand} />
 
       {related.length > 0 && (
         <section aria-labelledby="related">
