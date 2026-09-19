@@ -16,11 +16,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   if (!cat) notFound();
   const skills = cat.skills.map((s) => s.skill).filter((s) => s.status === "PUBLISHED");
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold">{cat.name}</h1>
-      {cat.description && <p className="text-zinc-600 dark:text-zinc-400">{cat.description}</p>}
-      {skills.length === 0 ? <p className="text-sm text-zinc-600">No published skills in {cat.name} yet.</p> : (
-        <div className="grid gap-4 md:grid-cols-3">
+    <div className="space-y-8 font-mono">
+      <p className="font-mono text-base font-medium text-muted">$ cat categories/{cat.slug}.md</p>
+      <h1 className="font-mono text-[38px] font-bold leading-[1.5] text-foreground">{cat.name}</h1>
+      {cat.description && <p className="max-w-xl font-mono text-base font-medium leading-[1.5] text-muted">{cat.description}</p>}
+      {skills.length === 0 ? <p className="font-mono text-base font-medium text-muted">$ search [{cat.name}] → 0 results. Try another term.</p> : (
+        <div className="grid gap-6 md:grid-cols-3">
           {skills.map((s) => (
             <SkillCard key={s.slug} skill={{ slug: s.slug, name: s.name, shortDescription: s.shortDescription, technologies: s.technologies.map((t) => t.technology.name), agents: s.agents.map((a) => a.agent.name) }} />
           ))}

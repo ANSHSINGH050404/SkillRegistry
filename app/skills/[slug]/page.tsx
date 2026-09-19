@@ -85,60 +85,61 @@ export default async function SkillPage({ params }: { params: Promise<{ slug: st
   }
 
   return (
-    <article className="space-y-8">
+    <article className="space-y-12 font-mono">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <header>
-        <h1 className="text-3xl font-semibold tracking-tight">{skill.name}</h1>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">{skill.shortDescription}</p>
-        <div className="mt-4 flex gap-2">
+        <p className="font-mono text-base font-medium text-muted">$ cat skills/{skill.slug}.md</p>
+        <h1 className="mt-2 font-mono text-[38px] font-bold leading-[1.5] text-foreground">{skill.name}</h1>
+        <p className="mt-2 max-w-xl font-mono text-base font-medium leading-[1.5] text-muted">{skill.shortDescription}</p>
+        <div className="mt-6 flex gap-3">
           <form action={`/api/skills/${skill.id}/install`} method="post">
-            <Button type="submit">Install Skill</Button>
+            <Button type="submit">$ install</Button>
           </form>
           {skill.repositoryUrl && (
             <Button variant="outline" asChild>
-              <a href={skill.repositoryUrl} target="_blank" rel="noopener noreferrer">Source</a>
+              <a href={skill.repositoryUrl} target="_blank" rel="noopener noreferrer">source →</a>
             </Button>
           )}
         </div>
       </header>
 
       <section aria-labelledby="what">
-        <h2 id="what" className="text-xl font-semibold">What does this skill do?</h2>
-        <div className="prose mt-2 max-w-none text-sm dark:prose-invert">
+        <h2 id="what" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## what-does-it-do</h2>
+        <div className="mt-4 max-w-none font-mono text-base font-medium leading-[1.5] text-foreground">
           <ReactMarkdown rehypePlugins={[rehypeSanitize]}>{skill.description}</ReactMarkdown>
         </div>
       </section>
 
       <section aria-labelledby="caps">
-        <h2 id="caps" className="text-xl font-semibold">Capabilities</h2>
-        <ul className="mt-2 list-disc pl-5 text-sm">
+        <h2 id="caps" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## capabilities</h2>
+        <ul className="mt-4 list-disc pl-5 font-mono text-base font-medium text-muted">
           {capabilitiesFrom(skill).map((c) => <li key={c}>{c}</li>)}
         </ul>
       </section>
 
       <section aria-labelledby="agents">
-        <h2 id="agents" className="text-xl font-semibold">Compatible Agents</h2>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <h2 id="agents" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## compatible-agents</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
           {skill.agents.map((a) => <Badge key={a.agentId}>{a.agent.name}</Badge>)}
         </div>
       </section>
 
       <section aria-labelledby="techs">
-        <h2 id="techs" className="text-xl font-semibold">Technologies</h2>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <h2 id="techs" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## technologies</h2>
+        <div className="mt-4 flex flex-wrap gap-2">
           {skill.technologies.map((t) => <Badge key={t.technologyId}>{t.technology.name}</Badge>)}
         </div>
       </section>
 
       <section aria-labelledby="install">
-        <h2 id="install" className="text-xl font-semibold">Installation</h2>
-        <pre className="mt-2 overflow-x-auto rounded-md bg-zinc-100 p-3 text-sm dark:bg-zinc-900">{skill.installCommand}</pre>
+        <h2 id="install" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## installation</h2>
+        <pre className="mt-4 overflow-x-auto rounded-md border border-hairline bg-surface p-4 font-mono text-base font-medium text-foreground">{skill.installCommand}<span className="terminal-cursor ml-2" aria-hidden="true" /></pre>
       </section>
 
       {related.length > 0 && (
         <section aria-labelledby="related">
-          <h2 id="related" className="text-xl font-semibold">Related Skills</h2>
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <h2 id="related" className="font-mono text-xl font-bold leading-[1.5] text-foreground">## related-skills</h2>
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
             {related.map((r) => (
               <SkillCard key={r.slug} skill={{
                 slug: r.slug, name: r.name, shortDescription: r.shortDescription,

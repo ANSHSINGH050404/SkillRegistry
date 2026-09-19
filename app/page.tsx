@@ -41,27 +41,39 @@ async function getHomeData() {
 export default async function Home() {
   const { trending, technologies, categories, recent } = await getHomeData();
   return (
-    <div className="space-y-12">
-      <section aria-labelledby="hero">
-        <h1 id="hero" className="text-3xl font-semibold tracking-tight">
-          Discover skills for your AI coding agent.
-        </h1>
-        <p className="mt-2 max-w-xl text-zinc-600 dark:text-zinc-400">
-          Find specialized skills for the tools and technologies you use every day.
-        </p>
-        <div className="mt-4 max-w-xl">
-          <SearchInput />
+    <div className="space-y-12 font-mono">
+      <section aria-labelledby="hero" className="overflow-hidden rounded-lg border border-hairline bg-surface">
+        <div className="flex items-center gap-2 border-b border-hairline px-4 py-2" aria-hidden="true">
+          <span className="inline-block h-3 w-3 rounded-full bg-muted opacity-40" />
+          <span className="inline-block h-3 w-3 rounded-full bg-muted opacity-40" />
+          <span className="inline-block h-3 w-3 rounded-full bg-muted opacity-40" />
+          <span className="ml-2 text-xs font-medium text-muted">~/skills — zsh</span>
+        </div>
+        <div className="space-y-4 p-6">
+          <p className="text-base font-medium text-muted">
+            <span className="text-foreground">$</span> agent-skills search --all
+          </p>
+          <h1 id="hero" className="text-[38px] font-bold leading-[1.5] text-foreground">
+            Discover skills for your AI coding agent.
+          </h1>
+          <p className="max-w-xl text-base font-medium leading-[1.5] text-muted">
+            Find specialized skills for the tools and technologies you use every day.
+            <span className="terminal-cursor ml-2" aria-hidden="true" />
+          </p>
+          <div className="max-w-xl">
+            <SearchInput />
+          </div>
         </div>
       </section>
 
       <section aria-labelledby="trending">
-        <h2 id="trending" className="text-xl font-semibold">Trending Skills</h2>
+        <h2 id="trending" className="font-mono text-xl font-bold leading-[1.5] text-foreground">$ trending --skills</h2>
         {trending.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <p className="mt-2 font-mono text-base font-medium text-muted">
             No skills yet. Try browsing technologies or check back after seeding.
           </p>
         ) : (
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
             {trending.map((s) => (
               <SkillCard key={s.slug} skill={{
                 slug: s.slug, name: s.name, shortDescription: s.shortDescription,
@@ -74,12 +86,12 @@ export default async function Home() {
       </section>
 
       <section aria-labelledby="techs">
-        <h2 id="techs" className="text-xl font-semibold">Popular Technologies</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <h2 id="techs" className="font-mono text-xl font-bold leading-[1.5] text-foreground">$ ls technologies/</h2>
+        <div className="mt-6 flex flex-wrap gap-2">
           {technologies.length === 0 ? (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Technologies appear after seeding.</p>
+            <p className="font-mono text-base font-medium text-muted">Technologies appear after seeding.</p>
           ) : technologies.map((t) => (
-            <Link key={t.slug} href={`/technologies/${t.slug}`} className="rounded-full border border-zinc-200 px-3 py-1 text-sm hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
+            <Link key={t.slug} href={`/technologies/${t.slug}`} className="rounded-full border border-hairline px-3 py-1 font-mono text-base font-medium text-muted transition-colors duration-150 ease-terminal hover:text-foreground">
               {t.name}
             </Link>
           ))}
@@ -87,12 +99,12 @@ export default async function Home() {
       </section>
 
       <section aria-labelledby="cats">
-        <h2 id="cats" className="text-xl font-semibold">Browse by Category</h2>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <h2 id="cats" className="font-mono text-xl font-bold leading-[1.5] text-foreground">$ ls categories/</h2>
+        <div className="mt-6 flex flex-wrap gap-2">
           {categories.length === 0 ? (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">Categories appear after seeding.</p>
+            <p className="font-mono text-base font-medium text-muted">Categories appear after seeding.</p>
           ) : categories.map((c) => (
-            <Link key={c.slug} href={`/categories/${c.slug}`} className="rounded-full border border-zinc-200 px-3 py-1 text-sm hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
+            <Link key={c.slug} href={`/categories/${c.slug}`} className="rounded-full border border-hairline px-3 py-1 font-mono text-base font-medium text-muted transition-colors duration-150 ease-terminal hover:text-foreground">
               {c.name}
             </Link>
           ))}
@@ -100,11 +112,11 @@ export default async function Home() {
       </section>
 
       <section aria-labelledby="recent">
-        <h2 id="recent" className="text-xl font-semibold">Recently Added Skills</h2>
+        <h2 id="recent" className="font-mono text-xl font-bold leading-[1.5] text-foreground">$ recent --skills</h2>
         {recent.length === 0 ? (
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">Nothing here yet.</p>
+          <p className="mt-2 font-mono text-base font-medium text-muted">Nothing here yet.</p>
         ) : (
-          <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div className="mt-6 grid gap-6 md:grid-cols-3">
             {recent.map((s) => (
               <SkillCard key={s.slug} skill={{
                 slug: s.slug, name: s.name, shortDescription: s.shortDescription,
@@ -116,12 +128,12 @@ export default async function Home() {
         )}
       </section>
 
-      <section aria-labelledby="authors" className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-        <h2 id="authors" className="text-xl font-semibold">For Skill Authors</h2>
-        <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+      <section aria-labelledby="authors" className="rounded-md border border-hairline bg-surface p-8">
+        <h2 id="authors" className="font-mono text-xl font-bold leading-[1.5] text-foreground">$ publish --skill</h2>
+        <p className="mt-2 font-mono text-base font-medium leading-[1.5] text-muted">
           Publish your skill and make it discoverable by developers using AI coding agents.
         </p>
-        <Button asChild className="mt-4">
+        <Button asChild className="mt-6">
           <Link href="/submit">Submit a Skill</Link>
         </Button>
       </section>

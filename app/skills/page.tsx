@@ -23,13 +23,13 @@ export default async function SkillsPage({
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Skills{q ? ` for “${q}”` : ""}</h1>
+    <div className="space-y-8 font-mono">
+      <h1 className="font-mono text-[38px] font-bold leading-[1.5] text-foreground">skills/{q ? `?q=${q}` : ""}</h1>
       <div className="max-w-xl"><SearchInput defaultValue={q} /></div>
       {items.length === 0 ? (
-        <div className="rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-          <p className="font-medium">No skills found{q ? ` for “${q}”` : ""}.</p>
-          <ul className="mt-2 list-disc pl-5 text-sm text-zinc-600 dark:text-zinc-400">
+        <div className="rounded-md border border-hairline bg-surface p-8">
+          <p className="font-mono text-base font-bold text-foreground">$ search {q ? `[${q}]` : ""} → 0 results</p>
+          <ul className="mt-4 list-disc pl-5 font-mono text-base font-medium text-muted">
             <li>Try another search term</li>
             <li>Browse technologies</li>
             <li>Browse categories</li>
@@ -46,7 +46,7 @@ export default async function SkillsPage({
           ))}
         </div>
       )}
-      {nextCursor && <p className="text-xs text-zinc-500">More results available (cursor pagination).</p>}
+      {nextCursor && <p className="font-mono text-xs font-medium text-muted">-- more results available (cursor pagination)</p>}
     </div>
   );
 }

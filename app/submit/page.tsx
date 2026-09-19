@@ -16,10 +16,11 @@ export default function SubmitPage() {
   });
 
   return (
-    <div className="max-w-xl space-y-6">
-      <h1 className="text-2xl font-semibold">Submit a Skill</h1>
+    <div className="max-w-xl space-y-8 font-mono">
+      <p className="font-mono text-base font-medium text-muted">$ submit --skill</p>
+      <h1 className="font-mono text-[38px] font-bold leading-[1.5] text-foreground">Submit a skill</h1>
       <form
-        className="space-y-4"
+        className="space-y-6"
         onSubmit={handleSubmit(async (data) => {
           setStatus(null);
           const res = await fetch("/api/submissions", {
@@ -30,12 +31,12 @@ export default function SubmitPage() {
           setStatus(res.ok ? "Submitted for review." : "Submission failed. Check fields and try again.");
         })}
       >
-        <div><label htmlFor="name" className="text-sm font-medium">Skill Name</label><Input id="name" {...register("name")} />{errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}</div>
-        <div><label htmlFor="shortDescription" className="text-sm font-medium">Short Description</label><Input id="shortDescription" {...register("shortDescription")} />{errors.shortDescription && <p className="text-sm text-red-600">{errors.shortDescription.message}</p>}</div>
-        <div><label htmlFor="repositoryUrl" className="text-sm font-medium">Repository URL</label><Input id="repositoryUrl" placeholder="https://github.com/owner/repo" {...register("repositoryUrl")} />{errors.repositoryUrl && <p className="text-sm text-red-600">{errors.repositoryUrl.message}</p>}</div>
-        <div><label htmlFor="installCommand" className="text-sm font-medium">Install Command</label><Input id="installCommand" placeholder="npx skills add my-skill" {...register("installCommand")} />{errors.installCommand && <p className="text-sm text-red-600">{errors.installCommand.message}</p>}</div>
-        <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "Submitting…" : "Submit for review"}</Button>
-        {status && <p role="status" className="text-sm">{status}</p>}
+        <div><label htmlFor="name" className="font-mono text-base font-medium text-foreground">name</label><Input id="name" {...register("name")} />{errors.name && <p className="mt-1 font-mono text-base font-medium text-danger">{errors.name.message}</p>}</div>
+        <div><label htmlFor="shortDescription" className="font-mono text-base font-medium text-foreground">short-description</label><Input id="shortDescription" {...register("shortDescription")} />{errors.shortDescription && <p className="mt-1 font-mono text-base font-medium text-danger">{errors.shortDescription.message}</p>}</div>
+        <div><label htmlFor="repositoryUrl" className="font-mono text-base font-medium text-foreground">repository-url</label><Input id="repositoryUrl" placeholder="https://github.com/owner/repo" {...register("repositoryUrl")} />{errors.repositoryUrl && <p className="mt-1 font-mono text-base font-medium text-danger">{errors.repositoryUrl.message}</p>}</div>
+        <div><label htmlFor="installCommand" className="font-mono text-base font-medium text-foreground">install-command</label><Input id="installCommand" placeholder="npx skills add my-skill" {...register("installCommand")} />{errors.installCommand && <p className="mt-1 font-mono text-base font-medium text-danger">{errors.installCommand.message}</p>}</div>
+        <Button type="submit" disabled={isSubmitting}>{isSubmitting ? "$ submitting…" : "$ submit --review"}</Button>
+        {status && <p role="status" className="font-mono text-base font-medium text-muted">{status}</p>}
       </form>
     </div>
   );

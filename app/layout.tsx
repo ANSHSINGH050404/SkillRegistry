@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -7,14 +7,10 @@ import { PostHogProvider } from "@/components/analytics/posthog-provider";
 import { Navbar } from "@/components/navigation/navbar";
 import { Footer } from "@/components/navigation/footer";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const terminalMono = JetBrains_Mono({
+  variable: "--font-terminal",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -46,15 +42,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${terminalMono.variable} h-full antialiased dark`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col font-mono">
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
         <ThemeProvider>
           <PostHogProvider>
             <Navbar />
-            <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8">{children}</main>
+            <main className="mx-auto w-full max-w-[880px] flex-1 px-4 py-8 md:px-6">{children}</main>
             <Footer />
           </PostHogProvider>
         </ThemeProvider>

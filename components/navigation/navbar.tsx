@@ -3,22 +3,22 @@ import { SearchInput } from "@/components/search/search-input";
 
 export function Navbar() {
   return (
-    <header className="border-b border-zinc-200 dark:border-zinc-800">
-      <nav aria-label="Primary" className="mx-auto flex h-14 max-w-6xl items-center gap-6 px-4">
-        <Link href="/" className="text-sm font-semibold tracking-tight">
-          Agent Skills
+    <header className="border-b border-hairline">
+      <nav aria-label="Primary" className="mx-auto flex h-14 max-w-[880px] items-center gap-6 px-4 font-mono md:px-6">
+        <Link href="/" className="font-mono text-base font-bold text-foreground">
+          ~/skills
         </Link>
-        <div className="hidden items-center gap-4 text-sm text-zinc-600 md:flex dark:text-zinc-400">
-          <Link href="/skills" className="hover:text-zinc-950 dark:hover:text-zinc-50">Skills</Link>
-          <Link href="/technologies" className="hover:text-zinc-950 dark:hover:text-zinc-50">Technologies</Link>
-          <Link href="/categories" className="hover:text-zinc-950 dark:hover:text-zinc-50">Categories</Link>
-          <Link href="/agents" className="hover:text-zinc-950 dark:hover:text-zinc-50">Agents</Link>
+        <div className="hidden items-center gap-4 md:flex">
+          <Link href="/skills" className="font-mono text-base font-medium text-muted underline transition-colors duration-150 ease-terminal hover:text-foreground">Skills</Link>
+          <Link href="/technologies" className="font-mono text-base font-medium text-muted underline transition-colors duration-150 ease-terminal hover:text-foreground">Technologies</Link>
+          <Link href="/categories" className="font-mono text-base font-medium text-muted underline transition-colors duration-150 ease-terminal hover:text-foreground">Categories</Link>
+          <Link href="/agents" className="font-mono text-base font-medium text-muted underline transition-colors duration-150 ease-terminal hover:text-foreground">Agents</Link>
         </div>
         <div className="ml-auto flex flex-1 max-w-xs items-center">
           <SearchInput />
         </div>
-        <Link href="/submit" className="text-sm font-medium underline-offset-4 hover:underline">
-          Submit Skill
+        <Link href="/submit" className="font-mono text-base font-medium text-foreground underline underline-offset-4 transition-opacity duration-150 ease-terminal hover:opacity-80">
+          Submit
         </Link>
       </nav>
     </header>
