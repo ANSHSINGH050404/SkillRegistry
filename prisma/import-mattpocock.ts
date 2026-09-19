@@ -128,9 +128,13 @@ async function main() {
 
     const folderTag = await tagId(folder);
     const sourceTag = await tagId("mattpocock");
+    const collectionCat = await catId("Matt Pocock");
     const cats = CATEGORY_MAP[key] ?? [];
-    const catIds: string[] = [];
-    for (const c of cats) catIds.push(await catId(c));
+    const catIds: string[] = [collectionCat];
+    for (const c of cats) {
+      const id = await catId(c);
+      if (!catIds.includes(id)) catIds.push(id);
+    }
 
     await prisma.skill.upsert({
       where: { slug },
